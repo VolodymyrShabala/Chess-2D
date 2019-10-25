@@ -2,173 +2,14 @@
 using UnityEngine;
 
 public class FigureData {
-    private int boardSize;
-    private BoardData boardData;
-
-    private int[] pawnBoardValues = new int[] {
-                 0,  0,  0,  0,  0,  0,  0,  0,
-                50, 50, 50, 50, 50, 50, 50, 50,
-                10, 10, 20, 30, 30, 20, 10, 10,
-                 5,  5, 10, 25, 25, 10,  5,  5,
-                 0,  0,  0, 20, 20,  0,  0,  0,
-                 5, -5,-10,  0,  0,-10, -5,  5,
-                 5, 10, 10,-20,-20, 10, 10,  5,
-                 0,  0,  0,  0,  0,  0,  0,  0
-    };
-
-    private int[] pawnBoardMirroredValues = new int[] {
-                0,  0,  0,  0,  0,  0,  0,  0,
-                5, 10, 10,-20,-20, 10, 10,  5,
-                5, -5,-10,  0,  0,-10, -5,  5,
-                0,  0,  0, 20, 20,  0,  0,  0,
-                5,  5, 10, 25, 25, 10,  5,  5,
-                10, 10, 20, 30, 30, 20, 10, 10,
-                50, 50, 50, 50, 50, 50, 50, 50,
-                0,  0,  0,  0,  0,  0,  0,  0
-    };
-
-    private int[] knightBoardValues = new int[] {
-                -50,-40,-30,-30,-30,-30,-40,-50,
-                -40,-20,  0,  0,  0,  0,-20,-40,
-                -30,  0, 10, 15, 15, 10,  0,-30,
-                -30,  5, 15, 20, 20, 15,  5,-30,
-                -30,  0, 15, 20, 20, 15,  0,-30,
-                -30,  5, 10, 15, 15, 10,  5,-30,
-                -40,-20,  0,  5,  5,  0,-20,-40,
-                -50,-40,-30,-30,-30,-30,-40,-50,
-    };
-
-    private int[] knightBoardMirroredValues = new int[] {
-                -50,-40,-30,-30,-30,-30,-40,-50,
-                -40,-20,  0,  5,  5,  0,-20,-40,
-                -30,  5, 10, 15, 15, 10,  5,-30,
-                -30,  0, 15, 20, 20, 15,  0,-30,
-                -30,  5, 15, 20, 20, 15,  5,-30,
-                -30,  0, 10, 15, 15, 10,  0,-30,
-                -40,-20,  0,  0,  0,  0,-20,-40,
-                -50,-40,-30,-30,-30,-30,-40,-50
-    };
-
-    private int[] bishopBoardValues = new int[] {
-                -20,-10,-10,-10,-10,-10,-10,-20,
-                -10,  0,  0,  0,  0,  0,  0,-10,
-                -10,  0,  5, 10, 10,  5,  0,-10,
-                -10,  5,  5, 10, 10,  5,  5,-10,
-                -10,  0, 10, 10, 10, 10,  0,-10,
-                -10, 10, 10, 10, 10, 10, 10,-10,
-                -10,  5,  0,  0,  0,  0,  5,-10,
-                -20,-10,-10,-10,-10,-10,-10,-20,
-    };
-
-    private int[] bishopBoardMirroredValues = new int[] {
-                -20,-10,-10,-10,-10,-10,-10,-20,
-                -10,  5,  0,  0,  0,  0,  5,-10,
-                -10, 10, 10, 10, 10, 10, 10,-10,
-                -10,  0, 10, 10, 10, 10,  0,-10,
-                -10,  5,  5, 10, 10,  5,  5,-10,
-                -10,  0,  5, 10, 10,  5,  0,-10,
-                -10,  0,  0,  0,  0,  0,  0,-10,
-                -20,-10,-10,-10,-10,-10,-10,-20
-    };
-
-    private int[] rookBoardValues = new int[] {
-                  0,  0,  0,  0,  0,  0,  0,  0,
-                  5, 10, 10, 10, 10, 10, 10,  5,
-                 -5,  0,  0,  0,  0,  0,  0, -5,
-                 -5,  0,  0,  0,  0,  0,  0, -5,
-                 -5,  0,  0,  0,  0,  0,  0, -5,
-                 -5,  0,  0,  0,  0,  0,  0, -5,
-                 -5,  0,  0,  0,  0,  0,  0, -5,
-                  0,  0,  0,  5,  5,  0,  0,  0
-    };
-
-    private int[] rookBoardMirroredValues = new int[] {
-                0,  0,  0,  5,  5,  0,  0,  0,
-                -5,  0,  0,  0,  0,  0,  0, -5,
-                -5,  0,  0,  0,  0,  0,  0, -5,
-                -5,  0,  0,  0,  0,  0,  0, -5,
-                -5,  0,  0,  0,  0,  0,  0, -5,
-                -5,  0,  0,  0,  0,  0,  0, -5,
-                5, 10, 10, 10, 10, 10, 10,  5,
-                0,  0,  0,  0,  0,  0,  0,  0
-    };
-
-    private int[] queenBoardValues = new int[] {
-                -20,-10,-10, -5, -5,-10,-10,-20,
-                -10,  0,  0,  0,  0,  0,  0,-10,
-                -10,  0,  5,  5,  5,  5,  0,-10,
-                 -5,  0,  5,  5,  5,  5,  0, -5,
-                  0,  0,  5,  5,  5,  5,  0, -5,
-                -10,  5,  5,  5,  5,  5,  0,-10,
-                -10,  0,  5,  0,  0,  0,  0,-10,
-                -20,-10,-10, -5, -5,-10,-10,-20
-    };
-
-    private int[] queenBoardMirroredValues = new int[] {
-                -20,-10,-10, -5, -5,-10,-10,-20,
-                -10,  0,  5,  0,  0,  0,  0,-10,
-                -10,  5,  5,  5,  5,  5,  0,-10,
-                 0,  0,  5,  5,  5,  5,  0, -5,
-                -5,  0,  5,  5,  5,  5,  0, -5,
-                -10,  0,  5,  5,  5,  5,  0,-10,
-                -10,  0,  0,  0,  0,  0,  0,-10,
-                -20,-10,-10, -5, -5,-10,-10,-20
-    };
-
-    private int[] kingBoardMiddleGameValues = new int[] {
-                -30,-40,-40,-50,-50,-40,-40,-30,
-                -30,-40,-40,-50,-50,-40,-40,-30,
-                -30,-40,-40,-50,-50,-40,-40,-30,
-                -30,-40,-40,-50,-50,-40,-40,-30,
-                -20,-30,-30,-40,-40,-30,-30,-20,
-                -10,-20,-20,-20,-20,-20,-20,-10,
-                 20, 20,  0,  0,  0,  0, 20, 20,
-                 20, 30, 10,  0,  0, 10, 30, 20
-    };
-
-    private int[] kingBoardMirroredMiddleGameValues = new int[] {
-                 20, 30, 10,  0,  0, 10, 30, 20,
-                 20, 20,  0,  0,  0,  0, 20, 20,
-                -10,-20,-20,-20,-20,-20,-20,-10,
-                -20,-30,-30,-40,-40,-30,-30,-20,
-                -30,-40,-40,-50,-50,-40,-40,-30,
-                -30,-40,-40,-50,-50,-40,-40,-30,
-                -30,-40,-40,-50,-50,-40,-40,-30,
-                -30,-40,-40,-50,-50,-40,-40,-30
-    };
-
-    //private int[] kingBoardLateGameValues = new int[] {
-    //            -50,-40,-30,-20,-20,-30,-40,-50,
-    //            -30,-20,-10,  0,  0,-10,-20,-30,
-    //            -30,-10, 20, 30, 30, 20,-10,-30,
-    //            -30,-10, 30, 40, 40, 30,-10,-30,
-    //            -30,-10, 30, 40, 40, 30,-10,-30,
-    //            -30,-10, 20, 30, 30, 20,-10,-30,
-    //            -30,-30,  0,  0,  0,  0,-30,-30,
-    //            -50,-30,-30,-30,-30,-30,-30,-50
-    //};
-
-    //private int[] kingBoardMirroredLateGameValues = new int[] {
-    //            -50,-30,-30,-30,-30,-30,-30,-50,
-    //            -30,-30,  0,  0,  0,  0,-30,-30,
-    //            -30,-10, 20, 30, 30, 20,-10,-30,
-    //            -30,-10, 30, 40, 40, 30,-10,-30,
-    //            -30,-10, 30, 40, 40, 30,-10,-30,
-    //            -30,-10, 20, 30, 30, 20,-10,-30,
-    //            -30,-20,-10,  0,  0,-10,-20,-30,
-    //            -50,-40,-30,-20,-20,-30,-40,-50
-    //};
-
-    public FigureData(int sizeOfBoard) {
-        boardSize = sizeOfBoard;
-    }
-
-    public FigureData(int sizeOfBoard, BoardData board) {
-        boardSize = sizeOfBoard;
+    private readonly int boardSize;
+    private readonly BoardData boardData;
+    
+    public FigureData(BoardData board) {
+        boardSize = board.BoardSize;
         boardData = board;
     }
 
-    // TODO: Oh boy...
     // TODO: Castling
     // TODO: En passant https://en.wikipedia.org/wiki/En_passant
     // TODO: Pawn promotion
@@ -187,7 +28,7 @@ public class FigureData {
             case FigureType.King:
                 return GetKingPossibleMoves(col, row, whitesTurn).ToArray();
             default:
-                Debug.LogError("Illegal call to GetPossibleMoves. You can call this only on figures.");
+                Debug.Log("Illegal call to GetPossibleMoves. You can call this only on figures.");
                 break;
         }
         return new Vector2Int[0];
@@ -393,63 +234,6 @@ public class FigureData {
         }
         return moves;
     }
-
-    public int GetFigureValue(FigureType type, bool whitesTurn) {
-        switch(type) {
-            case FigureType.Pawn:
-                return whitesTurn ? -10 : 10;
-            case FigureType.Rook:
-                return whitesTurn ? -30 : 30;
-            case FigureType.Knight:
-                return whitesTurn ? -30 : 30;
-            case FigureType.Bishop:
-                return whitesTurn ? -50 : 50;
-            case FigureType.Queen:
-                return whitesTurn ? -90 : 90;
-            case FigureType.King:
-                return whitesTurn ? -900 : 900;
-            case FigureType.White:
-                break;
-            case FigureType.Black:
-                break;
-            case FigureType.All:
-                break;
-            case FigureType.Empty:
-                break;
-            default:
-                Debug.LogError("Something went wrong in switch in GetFigureValue");
-                break;
-        }
-
-        return 0;
-    }
-
-    public int GetCellValue(FigureType figureType, Vector2Int cell, bool white = true) {
-        switch(figureType) {
-            case FigureType.Pawn:
-                //int value = white ? pawnBoardValues[cell.y * boardSize + cell.x] : pawnBoardMirroredValues[cell.y * boardSize + cell.x];
-                //if(boardData.IsCellOccupied(boardData.GetFigureType(cell), cell) && (boardData.IsCellOccupied(white ? FigureType.Black : FigureType.White, cell))) {
-                //    value += 30 * (white ? 1 : -1);
-                //}
-                //return value;
-                return white ? pawnBoardValues[cell.y * boardSize + cell.x] : pawnBoardMirroredValues[cell.y * boardSize + cell.x];
-            case FigureType.Rook:
-                return white ? rookBoardValues[cell.y * boardSize + cell.x] : rookBoardMirroredValues[cell.y * boardSize + cell.x];
-            case FigureType.Knight:
-                return white ? knightBoardValues[cell.y * boardSize + cell.x] : knightBoardMirroredValues[cell.y * boardSize + cell.x];
-            case FigureType.Bishop:
-                return white ? bishopBoardValues[cell.y * boardSize + cell.x] : bishopBoardMirroredValues[cell.y * boardSize + cell.x];
-            case FigureType.Queen:
-                return white ? queenBoardValues[cell.y * boardSize + cell.x] : queenBoardMirroredValues[cell.y * boardSize + cell.x];
-            case FigureType.King:
-                return white ? kingBoardMiddleGameValues[cell.y * boardSize + cell.x] : kingBoardMirroredMiddleGameValues[cell.y * boardSize + cell.x];
-            default:
-                Debug.LogError("Illegal call to GetCellValue. You can call this only on figures.");
-                break;
-        }
-
-        return 0;
-    }
 }
 
-public enum FigureType { Pawn, Rook, Knight, Bishop, Queen, King, White, Black, All, Empty }
+public enum FigureType { Pawn, Rook, Knight, Bishop, Queen, King, White, Black, Empty }

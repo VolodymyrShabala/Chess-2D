@@ -47,7 +47,7 @@ MonoBehaviour:
     type: 3}
   blackCellPrefab: {fileID: 7204405997213265640, guid: cee12bd741c4ba64796e72087ea895e9,
     type: 3}
-  whiteFigures:
+  whiteFigurePrefabs:
     king: {fileID: 112796584130513588, guid: 0aea18a905e243d4f9fedaa12998100d, type: 3}
     queen: {fileID: 2639237092867017904, guid: fe320d326a4f329449dc6e724830a4e7, type: 3}
     rook: {fileID: 1745787509849958308, guid: 89a2e0a663d6dfc4aa89960bd5bab68a, type: 3}
@@ -56,7 +56,7 @@ MonoBehaviour:
     knight: {fileID: 1721760113585775298, guid: 0a099a41cb5145247bd69f6f8ac04372,
       type: 3}
     pawn: {fileID: 7137943801892659602, guid: c5b37c132449f7449b747a98e29b34ba, type: 3}
-  blackFigures:
+  blackFigurePrefabs:
     king: {fileID: 7607177343555860742, guid: 67e5d5a650177084b840965fc086e14f, type: 3}
     queen: {fileID: 2665393652008668236, guid: 696d7c1788d577b4caf10923ce3170bb, type: 3}
     rook: {fileID: 282851126752388209, guid: 1ac7776f7bce9114491d96c455a8e16b, type: 3}
@@ -67,5 +67,3 @@ MonoBehaviour:
     pawn: {fileID: 4365615784487210231, guid: 4ef7245ab9cb97f40a47ef6864c9e430, type: 3}
   highlightCellPrefab: {fileID: 8835685455427508188, guid: 4ae308a9821fb2b4084f47697cf15442,
     type: 3}
-  gameFigures: []
-  figureBoardToShow: 0

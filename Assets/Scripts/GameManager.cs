@@ -2,42 +2,35 @@
 
 public class GameManager : MonoBehaviour {
     private BoardController board;
-    private bool playerPlaysWhite = true;
-
-    public Transform chosenFigure;
-    private bool playersTurn = true;
+    private Camera mainCamera;
+    private Vector3 chosenFigurePosition;
 
     private void Start() {
         board = FindObjectOfType<BoardController>();
-        //board.Init(playerPlaysWhite);
+        mainCamera = Camera.main;
     }
 
     private void Update() {
         if(Input.GetMouseButtonDown(0)) {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(ray.origin, new Vector3(0, 0, 1), Mathf.Infinity);
             if(hit.collider != null) {
-                Vector2Int pos = new Vector2Int((int)hit.transform.position.x, (int)hit.transform.position.y);
+                Vector3 hitPos = hit.transform.position;
+                Vector2Int pos2D = new Vector2Int((int)hitPos.x, (int)hitPos.y);
+                Vector3 illegalPosition = new Vector3(-1, -1, -1);
 
-                if(chosenFigure != null && !board.IsCellOccupiedWithFiguresOfPlayerColor(pos) && board.IsLegalMove(pos)) {
-                    board.MoveFigure(chosenFigure.position, pos);
-                    chosenFigure = null;
-                    playersTurn = false;
+                if(chosenFigurePosition != illegalPosition && !board.IsCellOccupiedWithFiguresOfPlayerColor(pos2D) && board.IsLegalMove(pos2D)) {
+                    board.MoveFigure(chosenFigurePosition, pos2D);
+                    chosenFigurePosition = illegalPosition;
+                    board.AIMove();
                     return;
                 }
 
-                // Maybe can get figure type from the beggining and check if it is not "Empty"
-                if(hit.collider.CompareTag("Figure") && board.IsCellOccupiedWithFiguresOfPlayerColor(pos)) {
-                    chosenFigure = hit.collider.transform;
-                    board.HighlightPossibleMoves(pos);
+                if(hit.collider.CompareTag("Figure") && board.IsCellOccupiedWithFiguresOfPlayerColor(pos2D)) {
+                    chosenFigurePosition = hitPos;
+                    board.HighlightPossibleMoves(pos2D);
                 }
             }
-        }
-
-        //TODO: Temp
-        if(!playersTurn) {
-            board.AIMove();
-            playersTurn = true;
         }
     }
 }

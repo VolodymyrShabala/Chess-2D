@@ -1,175 +1,143 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 
-public class BoardController : MonoBehaviour {
+public class BoardController : MonoBehaviour{
     private BoardData boardData;
     private AIOpponent ai;
     private bool playerPlaysWhite = true;
 
     [SerializeField] private GameObject whiteCellPrefab;
     [SerializeField] private GameObject blackCellPrefab;
-    [SerializeField] private Figures whiteFigures;
-    [SerializeField] private Figures blackFigures;
+    [SerializeField] private Figures whiteFigurePrefabs;
+    [SerializeField] private Figures blackFigurePrefabs;
     [SerializeField] private GameObject highlightCellPrefab;
-    private GameObject[] hightlightCells;
+    private GameObject[] highlightCell;
+    private int maxHighlightCell = 27; // Came up with this number through testing
 
     private GameObject[] gameFigures;
     private Vector2Int[] savedPossibleMoves;
 
-    [Header("Debug")]
-    [SerializeField] private FigureType figureBoardToShow;
-
-    private void Start() {
+    private void Start(){
         boardData = new BoardData();
         ai = new AIOpponent(boardData, 4);
         CreateBoard();
         PopulateBoard();
     }
 
-    private void CreateBoard() {
+    private void CreateBoard(){
         Transform boardParent = new GameObject("Board Holder").transform;
         boardParent.parent = transform;
         int index = 0;
         for(int r = 0; r < boardData.BoardSize; r++) {
             index++;
             for(int c = 0; c < boardData.BoardSize; c++) {
-                Instantiate(index % 2 == 0 ? whiteCellPrefab : blackCellPrefab, new Vector3(c, r, 1), Quaternion.identity, boardParent);
+                Instantiate(index % 2 == 0 ? whiteCellPrefab : blackCellPrefab, 
+                            new Vector3(c, r, 1), Quaternion.identity, boardParent);
                 index++;
             }
         }
     }
 
-    private void PopulateBoard() {
-        gameFigures = new GameObject[boardData.BoardSize * 4];
-        int index = 0;
+    private void PopulateBoard(){
+        SpawnFigures();
+        SpawnHighlightCells();
+    }
 
+    private void SpawnFigures(){
+        gameFigures = new GameObject[boardData.BoardSize * 4];
         Transform figureParent = new GameObject("Figure Holder").transform;
         figureParent.parent = transform;
-
-        hightlightCells = new GameObject[boardData.BoardSizeSqr];
-        Transform highlightParent = new GameObject("Highlight Holder").transform;
-        highlightParent.parent = transform;
+        int index = 0;
         for(int r = 0; r < boardData.BoardSize; r++) {
             for(int c = 0; c < boardData.BoardSize; c++) {
-                Vector3 pos = new Vector3(c, r);
-
-                //TODO: Check if I need to pass any data about highlight to BoardData
-                hightlightCells[r * boardData.BoardSize + c] = Instantiate(highlightCellPrefab, pos, Quaternion.identity, highlightParent);
-                hightlightCells[r * boardData.BoardSize + c].SetActive(false);
-
-                if(boardData.IsCellOccupied(FigureType.White, c, r)) {
-                    if(boardData.IsCellOccupied(FigureType.King, c, r)) {
-                        gameFigures[index] = Instantiate(whiteFigures.king, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "W_King";
-                        index++;
-                        continue;
-                    } else if(boardData.IsCellOccupied(FigureType.Queen, c, r)) {
-                        gameFigures[index] = Instantiate(whiteFigures.queen, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "W_Queen";
-                        index++;
-                        continue;
-                    } else if(boardData.IsCellOccupied(FigureType.Rook, c, r)) {
-                        gameFigures[index] = Instantiate(whiteFigures.rook, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "W_Rook";
-                        index++;
-                        continue;
-                    } else if(boardData.IsCellOccupied(FigureType.Bishop, c, r)) {
-                        gameFigures[index] = Instantiate(whiteFigures.bishop, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "W_Bishop"; ;
-                        index++;
-                        continue;
-                    } else if(boardData.IsCellOccupied(FigureType.Knight, c, r)) {
-                        gameFigures[index] = Instantiate(whiteFigures.knight, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "W_Knight";
-                        index++;
-                        continue;
-                    } else if(boardData.IsCellOccupied(FigureType.Pawn, c, r)) {
-                        gameFigures[index] = Instantiate(whiteFigures.pawn, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "W_Pawn";
-                        index++;
-                        continue;
-                    }
-                } else if(boardData.IsCellOccupied(FigureType.Black, c, r)) {
-                    if(boardData.IsCellOccupied(FigureType.King, c, r)) {
-                        gameFigures[index] = Instantiate(blackFigures.king, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "B_King";
-                        index++;
-                    } else if(boardData.IsCellOccupied(FigureType.Queen, c, r)) {
-                        gameFigures[index] = Instantiate(blackFigures.queen, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "B_Queen";
-                        index++;
-                    } else if(boardData.IsCellOccupied(FigureType.Rook, c, r)) {
-                        gameFigures[index] = Instantiate(blackFigures.rook, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "B_Rook";
-                        index++;
-                    } else if(boardData.IsCellOccupied(FigureType.Bishop, c, r)) {
-                        gameFigures[index] = Instantiate(blackFigures.bishop, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "B_Bishop"; ;
-                        index++;
-                    } else if(boardData.IsCellOccupied(FigureType.Knight, c, r)) {
-                        gameFigures[index] = Instantiate(blackFigures.knight, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "B_Knight";
-                        index++;
-                    } else if(boardData.IsCellOccupied(FigureType.Pawn, c, r)) {
-                        gameFigures[index] = Instantiate(blackFigures.pawn, pos, Quaternion.identity, figureParent);
-                        gameFigures[index].name = "B_Pawn";
-                        index++;
-                    }
+                GameObject figureToSpawn = GetFigureToSpawn(c, r);
+                if(figureToSpawn == null) {
+                    continue;
                 }
+
+                gameFigures[index] = Instantiate(figureToSpawn, new Vector3(c, r), Quaternion.identity, figureParent);
+                index++;
             }
+        }
+    }
+
+    private GameObject GetFigureToSpawn(int c, int r){
+        Vector2Int pos = new Vector2Int(c, r);
+        FigureType figureType = boardData.GetFigureType(pos);
+        switch(figureType) {
+            case FigureType.Pawn:
+                return boardData.IsCellOccupied(FigureType.White, pos) ? whiteFigurePrefabs.pawn : blackFigurePrefabs.pawn;
+            case FigureType.Rook:
+                return boardData.IsCellOccupied(FigureType.White, pos) ? whiteFigurePrefabs.rook : blackFigurePrefabs.rook;
+            case FigureType.Knight:
+                return boardData.IsCellOccupied(FigureType.White, pos) ? whiteFigurePrefabs.knight : blackFigurePrefabs.knight;
+            case FigureType.Bishop:
+                return boardData.IsCellOccupied(FigureType.White, pos) ? whiteFigurePrefabs.bishop : blackFigurePrefabs.bishop;
+            case FigureType.Queen:
+                return boardData.IsCellOccupied(FigureType.White, pos) ? whiteFigurePrefabs.queen : blackFigurePrefabs.queen;
+            case FigureType.King:
+                return boardData.IsCellOccupied(FigureType.White, pos) ? whiteFigurePrefabs.king : blackFigurePrefabs.king;
+        }
+
+        return null;
+    }
+
+    private void SpawnHighlightCells(){
+        Transform highlightParent = new GameObject("Highlight Holder").transform;
+        highlightParent.parent = transform;
+        highlightCell = new GameObject[maxHighlightCell];
+        for(int i = 0; i < maxHighlightCell; i++) {
+            highlightCell[i] = Instantiate(highlightCellPrefab, new Vector3(0, 0, 0), Quaternion.identity, highlightParent);
+            highlightCell[i].SetActive(false);
         }
     }
 
     public void AIMove() {
         ai.CalculateNextMove();
-        MoveFigure(ai.GetChessPieceToMove(), ai.GetBestMove());
+        Vector2Int chessToMove = ai.GetChessPieceToMove();
+        MoveFigure(new Vector3(chessToMove.x, chessToMove.y), ai.GetBestMove());
     }
 
-    // TODO: Fix problem with finding chess piece by it's position
+    // TODO: Remove finding chess piece by it's position
     public void MoveFigure(Vector3 oldPos, Vector2Int newPos) {
         boardData.MoveFigure(new Vector2Int((int)oldPos.x, (int)oldPos.y), newPos);
 
-        Vector3 pos = new Vector3(newPos.x, newPos.y, oldPos.z);
-        for(int i = 0; i < gameFigures.Length; i++) {
-            if(gameFigures[i].transform.position == pos) {
+        Vector3 newPos3D = new Vector3(newPos.x, newPos.y, oldPos.z);
+        int size = gameFigures.Length;
+        for(int i = 0; i < size; i++) {
+            if(gameFigures[i].transform.position == newPos3D) {
                 gameFigures[i].SetActive(false);
+                gameFigures[i].transform.position = new Vector3(-1, -1, -1);
+                break;
             }
         }
 
-        for(int i = 0; i < gameFigures.Length; i++) {
+        for(int i = 0; i < size; i++) {
             if(gameFigures[i].transform.position == oldPos) {
-                gameFigures[i].transform.position = pos;
+                gameFigures[i].transform.position = newPos3D;
+                break;
             }
         }
         UnhighlightPreviousMoves();
     }
-
-    public void MoveFigure(Vector2Int oldPos, Vector2Int newPos) {
-        MoveFigure(new Vector3(oldPos.x, oldPos.y), newPos);
-    }
-
+    
     public void HighlightPossibleMoves(Vector2Int pos) {
         UnhighlightPreviousMoves();
-        FigureType figureType = boardData.GetFigureType(pos.x, pos.y);
-        savedPossibleMoves = boardData.GetPossibleMoves(figureType, pos.x, pos.y);
-        for(int i = 0; i < savedPossibleMoves.Length; i++) {
-            HighlightCell(savedPossibleMoves[i]);
+        FigureType figureType = boardData.GetFigureType(pos);
+        savedPossibleMoves = boardData.GetPossibleMoves(figureType, pos);
+        int size = savedPossibleMoves.Length;
+        for(int i = 0; i < size; i++) {
+            highlightCell[i].transform.position = new Vector3(savedPossibleMoves[i].x, savedPossibleMoves[i].y);
+            highlightCell[i].SetActive(true);
         }
     }
 
-    private void HighlightCell(Vector2Int pos) {
-        int index = pos.y * boardData.BoardSize + pos.x;
-        hightlightCells[index].SetActive(true);
-        boardData.HighlightCell(index);
-    }
-
-    private void UnhighlightPreviousMoves() {
-        for(int i = 0; i < hightlightCells.Length; i++) {
-            if(boardData.IsCellHighlighted(i)) {
-                hightlightCells[i].SetActive(false);
-                boardData.UnhighlightCell(i);
+    private void UnhighlightPreviousMoves(){
+        for(int i = 0; i < maxHighlightCell; i++) {
+            if(highlightCell[i].activeSelf) {
+                highlightCell[i].SetActive(false);
+            } else {
+                break;
             }
         }
     }
@@ -186,58 +154,7 @@ public class BoardController : MonoBehaviour {
     }
 
     public bool IsCellOccupiedWithFiguresOfPlayerColor(Vector2Int pos) {
-        return boardData.IsCellOccupied(playerPlaysWhite ? FigureType.White : FigureType.Black, pos.x, pos.y);
-    }
-
-    private void OnGUI() {
-        if(figureBoardToShow == FigureType.Empty) {
-            return;
-        }
-
-        long boardToShow = 0L;
-        switch(figureBoardToShow) {
-            case FigureType.White:
-                boardToShow = boardData.WhiteFiguresBoard;
-                break;
-            case FigureType.Black:
-                boardToShow = boardData.BlackFiguresBoard;
-                break;
-            case FigureType.Pawn:
-                boardToShow = boardData.PawnsBoard;
-                break;
-            case FigureType.Knight:
-                boardToShow = boardData.KnightsBoard;
-                break;
-            case FigureType.Bishop:
-                boardToShow = boardData.BishopsBoard;
-                break;
-            case FigureType.Rook:
-                boardToShow = boardData.RooksBoard;
-                break;
-            case FigureType.Queen:
-                boardToShow = boardData.QueensBoard;
-                break;
-            case FigureType.King:
-                boardToShow = boardData.KingsBoard;
-                break;
-            case FigureType.All:
-                boardToShow = boardData.MainBoard;
-                break;
-            default:
-                print("Check OnGUI. It is broken in switch.");
-                break;
-        }
-
-        string toShow = Convert.ToString(boardToShow, 2).PadLeft(64, '0');
-        int index = 0;
-        for(int i = 1; i <= boardData.BoardSize; i++) {
-            toShow = toShow.Insert(boardData.BoardSize * i + index, "\n");
-            index++;
-        }
-        GUI.BeginGroup(new Rect(10, 10, 100, 200));
-        GUI.Box(new Rect(0, 0, 60, 125), "");
-        GUI.Label(new Rect(0, 0, 60, 125), toShow);
-        GUI.EndGroup();
+        return boardData.IsCellOccupied(playerPlaysWhite ? FigureType.White : FigureType.Black, pos);
     }
 }
 

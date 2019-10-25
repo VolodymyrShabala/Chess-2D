@@ -232,7 +232,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 766598ab206f17344aad9e285a159419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chosenFigure: {fileID: 0}
 --- !u!4 &819895738
 Transform:
   m_ObjectHideFlags: 0
@@ -312,11 +311,6 @@ PrefabInstance:
     - target: {fileID: 916395787149277016, guid: 6bc0f8102780d4442ab395635c96d84f,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5845289392629694939, guid: 6bc0f8102780d4442ab395635c96d84f,
-        type: 3}
-      propertyPath: figureBoardToShow
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
