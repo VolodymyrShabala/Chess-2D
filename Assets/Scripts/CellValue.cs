@@ -158,9 +158,9 @@ public class CellValue{
     //            -50,-40,-30,-20,-20,-30,-40,-50
     //};
 
-    public CellValue(BoardData boardData){
-        this.boardData = boardData;
-        boardSize = boardData.BoardSize;
+    public CellValue(BoardData data){
+        boardData = data;
+        boardSize = data.BoardSize;
     }
 
     public int GetCellValue(FigureType figureType, Vector2Int cell, bool white = true){
@@ -195,7 +195,7 @@ public class CellValue{
 
                 break;
             case FigureType.Queen:
-                value =  white ? queenBoardValues[cell.y * boardSize + cell.x] : queenBoardMirroredValues[cell.y * boardSize + cell.x];
+                value = white ? queenBoardValues[cell.y * boardSize + cell.x] : queenBoardMirroredValues[cell.y * boardSize + cell.x];
                 if(boardData.IsCellOccupied(boardData.GetFigureType(cell), cell) && (boardData.IsCellOccupied(white ? FigureType.Black : FigureType.White, cell))) {
                     value += GetFigureValue(figureType, white);
                 }
@@ -209,14 +209,14 @@ public class CellValue{
 
                 break;
             default:
-                Debug.Log("Illegal call to GetCellValue. You can call this only on figures.");
+                Debug.Log("Illegal call to GetCellValue with " + figureType + ". You can call this only on figures.");
                 break;
         }
 
         return value;
     }
     
-    private int GetFigureValue(FigureType type, bool white) {
+    private int GetFigureValue(FigureType type, bool white){
         switch(type) {
             case FigureType.Pawn:
                 return white ? -10 :  10;
@@ -231,7 +231,7 @@ public class CellValue{
             case FigureType.King:
                 return white ? -900 : 900;
             default:
-                Debug.Log("Illegal call to GetFigureValue. You can call this only on figures.");
+                Debug.Log("Illegal call to GetFigureValue with" + type + ". You can call this only on figures.");
                 break;
         }
 

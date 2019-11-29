@@ -13,22 +13,22 @@ public class FigureData {
     // TODO: Castling
     // TODO: En passant https://en.wikipedia.org/wiki/En_passant
     // TODO: Pawn promotion
-    public Vector2Int[] GetPossibleMoves(FigureType type, int col, int row, bool whitesTurn = true) {
+    public Vector2Int[] GetPossibleMoves(FigureType type, int col, int row, bool white = true) {
         switch(type) {
             case FigureType.Pawn:
-                return GetPawnPossibleMoves(col, row, whitesTurn).ToArray();
+                return GetPawnPossibleMoves(col, row, white).ToArray();
             case FigureType.Rook:
-                return GetRookPossibleMoves(col, row, whitesTurn).ToArray();
+                return GetRookPossibleMoves(col, row, white).ToArray();
             case FigureType.Knight:
-                return GetKnightPossibleMoves(col, row, whitesTurn).ToArray();
+                return GetKnightPossibleMoves(col, row, white).ToArray();
             case FigureType.Bishop:
-                return GetBishopPossibleMoves(col, row, whitesTurn).ToArray();
+                return GetBishopPossibleMoves(col, row, white).ToArray();
             case FigureType.Queen:
-                return GetQueenPossibleMoves(col, row, whitesTurn).ToArray();
+                return GetQueenPossibleMoves(col, row, white).ToArray();
             case FigureType.King:
-                return GetKingPossibleMoves(col, row, whitesTurn).ToArray();
+                return GetKingPossibleMoves(col, row, white).ToArray();
             default:
-                Debug.Log("Illegal call to GetPossibleMoves. You can call this only on figures.");
+                Debug.Log("Illegal call to GetPossibleMoves with " + type + ". PositionX: " + col + ", PositionY: " + row);
                 break;
         }
         return new Vector2Int[0];
@@ -74,10 +74,10 @@ public class FigureData {
 
             Vector2Int possibleMove = new Vector2Int(col - index, row);
             if(!breakLoop[0] && boardData.IsWithinGameBoard(possibleMove)) {
+                moves.Add(possibleMove);
                 if(boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove)) {
                     breakLoop[0] = true;
                 }
-                moves.Add(possibleMove);
                 if(boardData.IsCellOccupied(whitesTurn ? FigureType.White : FigureType.Black, possibleMove)) {
                     breakLoop[0] = true;
                     moves.Remove(possibleMove);
@@ -85,10 +85,10 @@ public class FigureData {
             }
             possibleMove = new Vector2Int(col + index, row);
             if(!breakLoop[1] && boardData.IsWithinGameBoard(possibleMove)) {
+                moves.Add(possibleMove);
                 if(boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove)) {
                     breakLoop[1] = true;
                 }
-                moves.Add(possibleMove);
                 if(boardData.IsCellOccupied(whitesTurn ? FigureType.White : FigureType.Black, possibleMove)) {
                     breakLoop[1] = true;
                     moves.Remove(possibleMove);
@@ -96,10 +96,10 @@ public class FigureData {
             }
             possibleMove = new Vector2Int(col, row - index);
             if(!breakLoop[2] && boardData.IsWithinGameBoard(possibleMove)) {
+                moves.Add(possibleMove);
                 if(boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove)) {
                     breakLoop[2] = true;
                 }
-                moves.Add(possibleMove);
                 if(boardData.IsCellOccupied(whitesTurn ? FigureType.White : FigureType.Black, possibleMove)) {
                     breakLoop[2] = true;
                     moves.Remove(possibleMove);
@@ -107,10 +107,10 @@ public class FigureData {
             }
             possibleMove = new Vector2Int(col, row + index);
             if(!breakLoop[3] && boardData.IsWithinGameBoard(possibleMove)) {
+                moves.Add(possibleMove);
                 if(boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove)) {
                     breakLoop[3] = true;
                 }
-                moves.Add(possibleMove);
                 if(boardData.IsCellOccupied(whitesTurn ? FigureType.White : FigureType.Black, possibleMove)) {
                     breakLoop[3] = true;
                     moves.Remove(possibleMove);
@@ -121,33 +121,42 @@ public class FigureData {
         return moves;
     }
 
-    private List<Vector2Int> GetKnightPossibleMoves(int col, int row, bool whitesTurn) {
+    private List<Vector2Int> GetKnightPossibleMoves(int col, int row, bool whitesTurn){
         List<Vector2Int> moves = new List<Vector2Int>();
         for(int i = -1; i <= 1; i += 2) {
             Vector2Int possibleMove = new Vector2Int(col, row + 2);
             possibleMove.x += i;
-            if(boardData.IsWithinGameBoard(possibleMove) && (boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove) || !boardData.IsCellOccupiedGlobal(possibleMove))) {
+            if(boardData.IsWithinGameBoard(possibleMove) &&
+               (boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove) ||
+                !boardData.IsCellOccupiedGlobal(possibleMove))) {
                 moves.Add(possibleMove);
             }
 
             possibleMove = new Vector2Int(col, row - 2);
             possibleMove.x += i;
-            if(boardData.IsWithinGameBoard(possibleMove) && (boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove) || !boardData.IsCellOccupiedGlobal(possibleMove))) {
+            if(boardData.IsWithinGameBoard(possibleMove) &&
+               (boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove) ||
+                !boardData.IsCellOccupiedGlobal(possibleMove))) {
                 moves.Add(possibleMove);
             }
 
             possibleMove = new Vector2Int(col + 2, row);
             possibleMove.y += i;
-            if(boardData.IsWithinGameBoard(possibleMove) && (boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove) || !boardData.IsCellOccupiedGlobal(possibleMove))) {
+            if(boardData.IsWithinGameBoard(possibleMove) &&
+               (boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove) ||
+                !boardData.IsCellOccupiedGlobal(possibleMove))) {
                 moves.Add(possibleMove);
             }
 
             possibleMove = new Vector2Int(col - 2, row);
             possibleMove.y += i;
-            if(boardData.IsWithinGameBoard(possibleMove) && (boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove) || !boardData.IsCellOccupiedGlobal(possibleMove))) {
+            if(boardData.IsWithinGameBoard(possibleMove) &&
+               (boardData.IsCellOccupied(whitesTurn ? FigureType.Black : FigureType.White, possibleMove) ||
+                !boardData.IsCellOccupiedGlobal(possibleMove))) {
                 moves.Add(possibleMove);
             }
         }
+
         return moves;
     }
 

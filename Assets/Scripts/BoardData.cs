@@ -14,7 +14,7 @@ public class BoardData {
     private long knightsBoard =      0L;
     private long pawnsBoard =        0L;
     private long dummyBoard =        0L;
-    
+
     #region Initialise Board Data
     public BoardData() {
         FillBoardData();
@@ -48,6 +48,12 @@ public class BoardData {
         SetCellOccupied(FigureType.King, new Vector2Int(4, 0));
         SetCellOccupied(FigureType.King, new Vector2Int(4, 7));
         
+        // SetCellOccupied(FigureType.Pawn, new Vector2Int(0, 1));
+        // SetCellOccupied(FigureType.Pawn, new Vector2Int(1, 6));
+        //
+        // SetCellOccupied(FigureType.White, new Vector2Int(0, 1));
+        // SetCellOccupied(FigureType.Black, new Vector2Int(1, 6));
+        
         for(int c = 0; c < BoardSize; c++) {
             SetCellOccupied(FigureType.Pawn, new Vector2Int(c, 1));
             SetCellOccupied(FigureType.Pawn, new Vector2Int(c, 6));
@@ -67,15 +73,29 @@ public class BoardData {
     #endregion
     
     #region Main Functions
-    public Vector2Int[] GetPossibleMoves(FigureType type, Vector2Int pos, bool whitesTurn = true) {
-        return figureData.GetPossibleMoves(type, pos.x, pos.y, whitesTurn);
+    public Vector2Int[] GetPossibleMovesByColor(bool white){
+        List<Vector2Int> returnList = new List<Vector2Int>();
+        Vector2Int[] pieces = GetAllChessPiecesByColor(white);
+        foreach(Vector2Int piece in pieces) {
+            Vector2Int[] temp = GetPossibleMoves(GetFigureType(piece), piece, white);
+            foreach(Vector2Int i in temp) {
+                returnList.Add(i);
+            }
+        }
+
+        return returnList.ToArray();
+    }
+    
+    public Vector2Int[] GetPossibleMoves(FigureType type, Vector2Int pos, bool white = true) {
+        return figureData.GetPossibleMoves(type, pos.x, pos.y, white);
     }
 
+    // TODO: Remove return bool
     // TODO: Look into this function to make it prettier
-    public void MoveFigure(Vector2Int from, Vector2Int to) {
+    public bool MoveFigure(Vector2Int from, Vector2Int to) {
         if(!IsCellOccupiedGlobal(from)) {
-            Debug.Log("There is no chess piece by this coordinates.");
-            return;
+            Debug.Log("There is no chess piece by coordinates X: " + from.x + ", Y: " + from.y);
+            return false;
         }
 
         // Get figure type and free the corresponding board
@@ -96,8 +116,9 @@ public class BoardData {
         // Set figure and it's color to a new position
         SetCellOccupied(type, to);
         SetCellOccupied(color, to);
-
+        
         CheckWinConditions(oldType, oldColor);
+        return true;
     }
 
     private void CheckWinConditions(FigureType type, FigureType color){
@@ -107,29 +128,30 @@ public class BoardData {
 
         Debug.Log(color == FigureType.White ? "Black won!" : "White won!");
     }
-#endregion
+    #endregion
     
     #region Helper Functions
     public Vector2Int[] GetAllChessPiecesByColor(bool white) {
-        List<Vector2Int> moves = new List<Vector2Int>();
+        List<Vector2Int> piecesPos = new List<Vector2Int>();
 
         for(int row = 0; row < BoardSize; row++) {
             for(int col = 0; col < BoardSize; col++) {
                 Vector2Int pos = new Vector2Int(col, row);
                 if(IsCellOccupied(white ? FigureType.White : FigureType.Black, pos)) {
-                    moves.Add(pos);
+                    piecesPos.Add(pos);
                 }
             }
         }
 
-        return moves.ToArray();
+        return piecesPos.ToArray();
     }
 
     public FigureType GetFigureType(Vector2Int pos) {
         if(!IsWithinGameBoard(pos)) {
             return FigureType.Empty;
         }
-        for(int i = 0; i <= (int)FigureType.Empty; i++) {
+        
+        for(int i = 0; i < (int)FigureType.Empty; i++) {
             if(IsCellOccupied((FigureType)i, pos)) {
                 return (FigureType)i;
             }
@@ -139,7 +161,7 @@ public class BoardData {
     }
     
     public bool IsCellOccupied(FigureType boardType, Vector2Int pos) {
-        int index = GetCellIndex(pos.x, pos.y);
+        int index = GetCellIndex(pos);
         if(index == -1) {
             return true;
         }
@@ -148,16 +170,18 @@ public class BoardData {
     }
 
     public bool IsCellOccupiedGlobal(Vector2Int pos) {
-        int index = GetCellIndex(pos.x, pos.y);
+        int index = GetCellIndex(pos);
         if(index == -1) {
             return true;
         }
+        
         long mask = 1L << index;
         return ((whiteFiguresBoard | blackFiguresBoard) & mask) != 0;    
     }
     
-    private void SetCellOccupied(FigureType boardType, Vector2Int pos) {
-        int index = GetCellIndex(pos.x, pos.y);
+    // TODO: Make private
+    public void SetCellOccupied(FigureType boardType, Vector2Int pos) {
+        int index = GetCellIndex(pos);
         if(index == -1) {
             return;
         }
@@ -166,8 +190,9 @@ public class BoardData {
         GetBoardByReference(boardType) |= mask;
     }
 
-    private void SetCellFree(FigureType boardType, Vector2Int pos) {
-        int index = GetCellIndex(pos.x, pos.y);
+    // TODO: Make private
+    public void SetCellFree(FigureType boardType, Vector2Int pos) {
+        int index = GetCellIndex(pos);
         if(index == -1) {
             return;
         }
@@ -176,8 +201,9 @@ public class BoardData {
         GetBoardByReference(boardType) &= ~mask;
     }
 
+    // TODO: Make private
     // Added this function to improve readability of the code
-    private ref long GetBoardByReference(FigureType boardType){
+    public ref long GetBoardByReference(FigureType boardType){
         switch(boardType) {
             case FigureType.Pawn:
                 return ref pawnsBoard;
@@ -206,11 +232,11 @@ public class BoardData {
         return pos.x >= 0 && pos.x < BoardSize && pos.y >= 0 && pos.y < BoardSize;
     }
     
-    private int GetCellIndex(int col, int row) {
-        if(!IsWithinGameBoard(new Vector2Int(col, row))) {
+    private int GetCellIndex(Vector2Int pos) {
+        if(!IsWithinGameBoard(pos)) {
             return -1;
         }
-        return (1 + row) * BoardSize - col - 1;
+        return (1 + pos.y) * BoardSize - pos.x - 1;
     }
     #endregion
 }

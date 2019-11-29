@@ -67,3 +67,4 @@ MonoBehaviour:
     pawn: {fileID: 4365615784487210231, guid: 4ef7245ab9cb97f40a47ef6864c9e430, type: 3}
   highlightCellPrefab: {fileID: 8835685455427508188, guid: 4ae308a9821fb2b4084f47697cf15442,
     type: 3}
+  figureBoardToShow: 6

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 public class BoardController : MonoBehaviour{
     private BoardData boardData;
@@ -16,10 +17,13 @@ public class BoardController : MonoBehaviour{
 
     private GameObject[] gameFigures;
     private Vector2Int[] savedPossibleMoves;
+    
+    [Header("Debug")]
+    [SerializeField] private FigureType figureBoardToShow;
 
     private void Start(){
         boardData = new BoardData();
-        ai = new AIOpponent(boardData, 4);
+        ai = new AIOpponent(boardData, 3, this);
         CreateBoard();
         PopulateBoard();
     }
@@ -44,10 +48,9 @@ public class BoardController : MonoBehaviour{
     }
 
     private void SpawnFigures(){
-        gameFigures = new GameObject[boardData.BoardSize * 4];
+        List<GameObject> temp = new List<GameObject>();
         Transform figureParent = new GameObject("Figure Holder").transform;
         figureParent.parent = transform;
-        int index = 0;
         for(int r = 0; r < boardData.BoardSize; r++) {
             for(int c = 0; c < boardData.BoardSize; c++) {
                 GameObject figureToSpawn = GetFigureToSpawn(c, r);
@@ -55,10 +58,11 @@ public class BoardController : MonoBehaviour{
                     continue;
                 }
 
-                gameFigures[index] = Instantiate(figureToSpawn, new Vector3(c, r), Quaternion.identity, figureParent);
-                index++;
+                temp.Add(Instantiate(figureToSpawn, new Vector3(c, r), Quaternion.identity, figureParent));
             }
         }
+
+        gameFigures = temp.ToArray();
     }
 
     private GameObject GetFigureToSpawn(int c, int r){
@@ -92,22 +96,25 @@ public class BoardController : MonoBehaviour{
         }
     }
 
-    public void AIMove() {
-        ai.CalculateNextMove();
+    public void AIMove(bool white) {
+        ai.CalculateNextMove(white);
         Vector2Int chessToMove = ai.GetChessPieceToMove();
         MoveFigure(new Vector3(chessToMove.x, chessToMove.y), ai.GetBestMove());
     }
 
     // TODO: Remove finding chess piece by it's position
     public void MoveFigure(Vector3 oldPos, Vector2Int newPos) {
-        boardData.MoveFigure(new Vector2Int((int)oldPos.x, (int)oldPos.y), newPos);
+        if(!boardData.MoveFigure(new Vector2Int((int) oldPos.x, (int) oldPos.y), newPos)) {
+            return;
+        }
 
+        
         Vector3 newPos3D = new Vector3(newPos.x, newPos.y, oldPos.z);
         int size = gameFigures.Length;
         for(int i = 0; i < size; i++) {
             if(gameFigures[i].transform.position == newPos3D) {
                 gameFigures[i].SetActive(false);
-                gameFigures[i].transform.position = new Vector3(-1, -1, -1);
+                gameFigures[i].transform.position = new Vector3(-10 * i, -10 * i, -1);
                 break;
             }
         }
@@ -118,6 +125,7 @@ public class BoardController : MonoBehaviour{
                 break;
             }
         }
+        
         UnhighlightPreviousMoves();
     }
     
@@ -143,6 +151,10 @@ public class BoardController : MonoBehaviour{
     }
 
     public bool IsLegalMove(Vector2Int pos) {
+        if(savedPossibleMoves == null) {
+            return false;
+        }
+        
         if(boardData.IsWithinGameBoard(pos)) {
             for(int i = 0; i < savedPossibleMoves.Length; i++) {
                 if(pos == savedPossibleMoves[i]) {
@@ -155,6 +167,25 @@ public class BoardController : MonoBehaviour{
 
     public bool IsCellOccupiedWithFiguresOfPlayerColor(Vector2Int pos) {
         return boardData.IsCellOccupied(playerPlaysWhite ? FigureType.White : FigureType.Black, pos);
+    }
+    
+    private void OnGUI() {
+        if(figureBoardToShow == FigureType.Empty) {
+            return;
+        }
+
+        long boardToShow = boardData.GetBoardByReference(figureBoardToShow);
+
+        string toShow = Convert.ToString(boardToShow, 2).PadLeft(64, '0');
+        int index = 0;
+        for(int i = 1; i <= boardData.BoardSize; i++) {
+            toShow = toShow.Insert(boardData.BoardSize * i + index, "\n");
+            index++;
+        }
+        GUI.BeginGroup(new Rect(10, 10, 100, 200));
+        GUI.Box(new Rect(0, 0, 60, 125), "");
+        GUI.Label(new Rect(0, 0, 60, 125), toShow);
+        GUI.EndGroup();
     }
 }
 
