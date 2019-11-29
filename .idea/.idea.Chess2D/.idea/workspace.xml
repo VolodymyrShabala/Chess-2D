@@ -41,12 +41,12 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Assets/Scripts/BoardData.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/CellValue.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/AIOpponent.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/BoardController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GameManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/FigureData.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/AIOpponent.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/BoardData.cs" />
       </list>
     </option>
   </component>
@@ -104,7 +104,7 @@
       <workItem from="1574760426295" duration="17180000" />
       <workItem from="1574846161497" duration="8659000" />
       <workItem from="1574934743804" duration="10903000" />
-      <workItem from="1575021827354" duration="10520000" />
+      <workItem from="1575021827354" duration="10806000" />
     </task>
     <servers />
   </component>

@@ -47,13 +47,7 @@ public class BoardData {
         // Kings
         SetCellOccupied(FigureType.King, new Vector2Int(4, 0));
         SetCellOccupied(FigureType.King, new Vector2Int(4, 7));
-        
-        // SetCellOccupied(FigureType.Pawn, new Vector2Int(0, 1));
-        // SetCellOccupied(FigureType.Pawn, new Vector2Int(1, 6));
-        //
-        // SetCellOccupied(FigureType.White, new Vector2Int(0, 1));
-        // SetCellOccupied(FigureType.Black, new Vector2Int(1, 6));
-        
+
         for(int c = 0; c < BoardSize; c++) {
             SetCellOccupied(FigureType.Pawn, new Vector2Int(c, 1));
             SetCellOccupied(FigureType.Pawn, new Vector2Int(c, 6));
